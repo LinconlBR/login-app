@@ -5,20 +5,59 @@ import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { redirect } from "next/navigation"
+
+import { useState } from "react"
 import {User} from "@supabase/supabase-js"
+import { getSupabaseBrowserClient } from "@/lib/supabase/browse-client"
+
+
 
 type EmailPasswordDemoProps = {
     user: User | null,
 };
 
 export default function EmailPasswordDemo({ user} : EmailPasswordDemoProps) {
+    /* main variables*/
+    const [email,setEmail] = useState("");
+    const [password,setPassword] = useState("");
+    
+    /* UX variables*/
+    const [erro,setErro] = useState("");
+    const [loading,setLoading] = useState(false);
+
+    /* db variables */ 
+    const supabase = getSupabaseBrowserClient();
+
+
+    async function handleSubmit (event: React.FormEvent<HTMLFormElement>){
+        event.preventDefault();
+        console.log(email,password)
+        setLoading(true)
+        const {error, data} = await supabase.auth.signUp({
+            email,
+            password,
+        })
+        if(error){
+            setErro(error.message)
+            setLoading(false)
+
+        }else{
+            console.log(data)
+            setLoading(false)
+            
+        }
+
+    }   
+
     return (
         <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
         <div className="w-full max-w-sm md:max-w-4xl">
             <div className="flex flex-col gap-6">
                 <Card className="overflow-hidden p-0">
                     <CardContent className="grid p-0 md:grid-cols-2">
-                        <form className="p-6 md:p-8">
+                        <form  onSubmit={handleSubmit} className="p-6 md:p-8">
+                            {erro ?? <p >{erro}</p>}
                             <FieldGroup>
                             <div className="flex flex-col items-center gap-2 text-center">
                                 <h1 className="text-2xl font-bold">Create your account</h1>
@@ -30,6 +69,7 @@ export default function EmailPasswordDemo({ user} : EmailPasswordDemoProps) {
                                 <FieldLabel htmlFor="email">Email</FieldLabel>
                                 <Input
                                 id="email"
+                                onChange={(e) => setEmail(e.target.value)}
                                 type="email"
                                 placeholder="m@example.com"
                                 required
@@ -49,7 +89,11 @@ export default function EmailPasswordDemo({ user} : EmailPasswordDemoProps) {
                                     <FieldLabel htmlFor="confirm-password">
                                     Confirm Password
                                     </FieldLabel>
-                                    <Input id="confirm-password" type="password" required />
+                                    <Input 
+                                    id="confirm-password" 
+                                    type="password" required 
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    />
                                 </Field>
                                 </Field>
                                 <FieldDescription>
@@ -57,7 +101,12 @@ export default function EmailPasswordDemo({ user} : EmailPasswordDemoProps) {
                                 </FieldDescription>
                             </Field>
                             <Field>
-                                <Button type="submit">Create Account</Button>
+                                {loading ?
+                                    <Button type="submit" disabled>Creating...</Button>
+                                :
+                                    <Button type="submit">Create Account</Button>
+                                }
+                                
                             </Field>
                             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                                 Or continue with
