@@ -7,24 +7,31 @@ import type { TooltipValueType } from "recharts"
 
 import { cn } from "@/lib/utils"
 
-export function Chart({chartData,chartConfig} ) {
+type ChartDataItem = Record<string, string | number | null | undefined>
+
+type ChartProps = {
+  chartData: ChartDataItem[]
+  chartConfig: ChartConfig
+}
+
+export function Chart({ chartData, chartConfig }: ChartProps) {
   return (
-            <ChartContainer config={chartConfig} className="h-80 w-full">
-          <BarChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-          </BarChart>
-        </ChartContainer>
+    <ChartContainer config={chartConfig} className="h-80 w-full">
+      <BarChart accessibilityLayer data={chartData}>
+        <CartesianGrid vertical={false} />
+        <XAxis
+          dataKey="month"
+          tickLine={false}
+          tickMargin={10}
+          axisLine={false}
+          tickFormatter={(value) => value.slice(0, 3)}
+        />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartLegend content={<ChartLegendContent />} />
+        <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+        <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+      </BarChart>
+    </ChartContainer>
   )
 }
 // Format: { THEME_NAME: CSS_SELECTOR }
